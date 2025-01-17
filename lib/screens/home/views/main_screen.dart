@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
                     // mainAxisSize: MainAxisSize.max,
