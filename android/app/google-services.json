@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "986134444990",
+    "project_id": "tourease-2cd8a",
+    "storage_bucket": "tourease-2cd8a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:986134444990:android:932fb16141741857dc57ef",
+        "android_client_info": {
+          "package_name": "com.example.data_management_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARoiknRtV1b02qjtCIggQSVKgZwsOVaGc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
