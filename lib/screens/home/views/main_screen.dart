@@ -18,11 +18,44 @@ int? index;
 
 class _MainScreenState extends State<MainScreen> {
   List<Person> people = [];
-  List<Category> categories = [];
+  List<Category> categories = [
+    Category(name: 'Food', color: Colors.red, icon: Icons.fastfood),
+    Category(name: 'Transport', color: Colors.blue, icon: Icons.train_sharp),
+    Category(
+        name: 'Medicals',
+        color: Colors.green,
+        icon: Icons.local_hospital_rounded),
+  ];
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
+  final ScrollController _scrollControllerPrimary = ScrollController();
+  final ScrollController _scrollControllerSecondary = ScrollController();
+  late PageController _pageController;
+  int _currentPageIndex = 0;
   Category? selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+
+    // Listening to page changes
+    _pageController.addListener(() {
+      int currentPage = _pageController.page?.round() ?? 0;
+      if (_currentPageIndex != currentPage) {
+        setState(() {
+          _currentPageIndex = currentPage;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   //add people to the list
   void _addPerson(String name) {
@@ -125,105 +158,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  //show add expense dialog box
-  // void _showAddExpenseDialog() {
-  //   if (people.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('Please add at least one person first.')),
-  //     );
-  //     return;
-  //   }
-
-  //   String selectedPerson = people.first.name;
-  //   String selectedCategory = categories.first.name;
-  //   amountController.clear();
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Add Expense'),
-  //       content: Column(
-  //         mainAxisSize: MainAxisSize.min,
-  //         children: [
-  //           DropdownButtonFormField<String>(
-  //             value: selectedPerson,
-  //             items: people
-  //                 .map((person) => DropdownMenuItem(
-  //                     value: person.name, child: Text(person.name)))
-  //                 .toList(),
-  //             onChanged: (value) {
-  //               selectedPerson = value!;
-  //             },
-  //             decoration: const InputDecoration(labelText: 'Person'),
-  //           ),
-  //           // DropdownButtonFormField<String>(
-  //           //   value: selectedCategory,
-  //           //   items: categories
-  //           //       .map((category) =>
-  //           //           DropdownMenuItem(value: category, child: Text(category)))
-  //           //       .toList(),
-  //           //   onChanged: (value) {
-  //           //     selectedCategory = value!;
-  //           //   },
-  //           //   decoration: const InputDecoration(labelText: 'Category'),
-  //           // ),
-  //           DropdownButtonFormField<Category>(
-  //             value: categories.isNotEmpty
-  //                 ? categories.first
-  //                 : null, // Default to the first category
-  //             items: categories.map((category) {
-  //               return DropdownMenuItem(
-  //                 value: category,
-  //                 child: Row(
-  //                   children: [
-  //                     CircleAvatar(
-  //                       backgroundColor: category.color,
-  //                       child: Icon(category.icon, color: Colors.white),
-  //                     ),
-  //                     const SizedBox(width: 8),
-  //                     Text(category.name),
-  //                   ],
-  //                 ),
-  //               );
-  //             }).toList(),
-  //             onChanged: (selectedCategory) {
-  //               // Handle selection
-  //               if (selectedCategory != null) {
-  //                 setState(() {
-  //                   this.selectedCategory =
-  //                       selectedCategory; // Assign the selected Category
-  //                 });
-  //               }
-  //             },
-  //             decoration: const InputDecoration(labelText: 'Category'),
-  //           ),
-
-  //           TextField(
-  //             controller: amountController,
-  //             keyboardType: TextInputType.number,
-  //             decoration: const InputDecoration(labelText: 'Amount'),
-  //           ),
-  //         ],
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: const Text('Cancel'),
-  //         ),
-  //         ElevatedButton(
-  //           onPressed: () {
-  //             double amount = double.tryParse(amountController.text) ?? 0.0;
-  //             if (amount > 0) {
-  //               _addExpense(selectedPerson, selectedCategory, amount);
-  //               Navigator.of(context).pop();
-  //             }
-  //           },
-  //           child: const Text('Add'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
   void _showAddExpenseDialog() {
     if (people.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -500,6 +434,7 @@ class _MainScreenState extends State<MainScreen> {
           person.expenses.values.fold(0.0, (sum, expense) => sum + expense);
       return {
         'name': person.name,
+        'totalSpent': totalSpent,
         'balance': totalSpent - perPersonShare,
       };
     }).toList();
@@ -737,20 +672,41 @@ class _MainScreenState extends State<MainScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Transactions',
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _currentPageIndex = 0;
+                          _pageController.animateToPage(0,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut);
+                        });
+                      },
+                      child: Text(
+                        'Transactions',
+                        style: TextStyle(
+                            fontSize: _currentPageIndex == 0 ? 16 : 14,
+                            color: _currentPageIndex == 0
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Theme.of(context).colorScheme.outline,
+                            fontWeight: FontWeight.bold),
+                      ),
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        setState(() {
+                          _currentPageIndex = 1;
+                          _pageController.animateToPage(1,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut);
+                        });
+                      },
                       child: Text(
-                        'View All',
+                        'People Payments',
                         style: TextStyle(
-                            fontSize: 14,
-                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: _currentPageIndex == 1 ? 16 : 14,
+                            color: _currentPageIndex == 1
+                                ? Theme.of(context).colorScheme.onSurface
+                                : Theme.of(context).colorScheme.outline,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -759,110 +715,245 @@ class _MainScreenState extends State<MainScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: 40,
-                    ),
-                    child: Scrollbar(
-                      interactive: true,
-                      radius: const Radius.circular(50),
-                      thickness: 5,
-                      thumbVisibility: true,
-                      trackVisibility: false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: ListView.builder(
-                            keyboardDismissBehavior:
-                                ScrollViewKeyboardDismissBehavior.onDrag,
-                            itemCount: categoryTotals.length,
-                            itemBuilder: (context, int i) {
-                              final category = categoryTotals.keys.elementAt(i);
-                              final totalExpense = categoryTotals[category]!;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 16.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
+
+                SizedBox(
+                  // width: MediaQuery.of(context).size.width *
+                  //     2, // Make the container large enough to allow scrolling
+                  height: MediaQuery.of(context).size.height / 2.4,
+                  child: PageView(
+                    controller: _pageController,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 40,
+                        ),
+                        child: Scrollbar(
+                          controller: _scrollControllerPrimary,
+                          interactive: true,
+                          radius: const Radius.circular(50),
+                          thickness: 5,
+                          thumbVisibility: true,
+                          trackVisibility: false,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: ListView.builder(
+                                controller: _scrollControllerPrimary,
+                                keyboardDismissBehavior:
+                                    ScrollViewKeyboardDismissBehavior.onDrag,
+                                itemCount: categoryTotals.length,
+                                itemBuilder: (context, int i) {
+                                  final category =
+                                      categoryTotals.keys.elementAt(i);
+                                  final totalExpense =
+                                      categoryTotals[category]!;
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Colors.white),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Stack(
-                                              alignment: Alignment.center,
+                                            Row(
                                               children: [
-                                                Container(
-                                                  //Yellow colour Circle
-                                                  width: 50,
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                      color: category
-                                                          .color, //Colors.yellow[700],
-                                                      shape: BoxShape.circle),
+                                                Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      //Yellow colour Circle
+                                                      width: 50,
+                                                      height: 50,
+                                                      decoration: BoxDecoration(
+                                                          color: category
+                                                              .color, //Colors.yellow[700],
+                                                          shape:
+                                                              BoxShape.circle),
+                                                    ),
+                                                    Icon(category.icon,
+                                                        color: Colors.white),
+                                                    // myTransactionData[i]['icon'],
+                                                    // const Icon(
+                                                    //   Icons.myTransactionData[i]['icon'],
+                                                    //   color: Colors.white,
+                                                    // )
+                                                  ],
                                                 ),
-                                                Icon(category.icon,
-                                                    color: Colors.white),
-                                                // myTransactionData[i]['icon'],
-                                                // const Icon(
-                                                //   Icons.myTransactionData[i]['icon'],
-                                                //   color: Colors.white,
-                                                // )
+                                                const SizedBox(
+                                                  width: 12,
+                                                ),
+                                                Text(
+                                                  category.name,
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
                                               ],
                                             ),
-                                            const SizedBox(
-                                              width: 12,
-                                            ),
-                                            Text(
-                                              category.name,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            const SizedBox(
-                                              width: 20,
-                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  'Rs. ${totalExpense.toStringAsFixed(2)}',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  "date",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            )
                                           ],
                                         ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              'Rs. ${totalExpense.toStringAsFixed(2)}',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              "date",
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSurface,
-                                                  fontWeight: FontWeight.w400),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            }),
+                                  );
+                                }),
+                          ),
+                        ),
                       ),
-                    ),
+
+                      //second page
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 40,
+                        ),
+                        child: Scrollbar(
+                          controller: _scrollControllerSecondary,
+                          interactive: true,
+                          radius: const Radius.circular(50),
+                          thickness: 5,
+                          thumbVisibility: true,
+                          trackVisibility: false,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: ListView.builder(
+                                controller: _scrollControllerSecondary,
+                                keyboardDismissBehavior:
+                                    ScrollViewKeyboardDismissBehavior.onDrag,
+                                itemCount: balances.length,
+                                itemBuilder: (context, int i) {
+                                  final balance =
+                                      balances.elementAt(i);
+                                  // final totalExpense =
+                                  //     categoryTotals[balance]!;
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Colors.white),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      //Yellow colour Circle
+                                                      width: 50,
+                                                      height: 50,
+                                                      decoration:const BoxDecoration(
+                                                          color: Colors.red, //Colors.yellow[700],
+                                                          shape:
+                                                              BoxShape.circle),
+                                                    ),
+                                                    const Icon(Icons.person,
+                                                        color: Colors.white),
+                                                    // myTransactionData[i]['icon'],
+                                                    // const Icon(
+                                                    //   Icons.myTransactionData[i]['icon'],
+                                                    //   color: Colors.white,
+                                                    // )
+                                                  ],
+                                                ),
+                                                const SizedBox(
+                                                  width: 12,
+                                                ),
+                                                Text(
+                                                  balance['name'],
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                                const SizedBox(
+                                                  width: 20,
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  'Rs. ${balance['balance'].toStringAsFixed(2)}',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  "${balance['totalSpent'].toStringAsFixed(2)}",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
