@@ -26,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
         color: Colors.green,
         icon: Icons.local_hospital_rounded),
   ];
+  final Map<String, Color> _colorMap = {};
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
@@ -34,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   Category? selectedCategory;
+  Color _currentColor = Colors.red;
 
   @override
   void initState() {
@@ -146,8 +148,16 @@ class _MainScreenState extends State<MainScreen> {
               foregroundColor: WidgetStateProperty.all(Colors.white),
             ),
             onPressed: () {
+              setState(() {
+                _currentColor = _getRandomColor();
+              });
               if (nameController.text.trim().isNotEmpty) {
                 _addPerson(nameController.text.trim());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          'Successfully added ${nameController.text.trim()}.')),
+                );
                 Navigator.of(context).pop();
               }
             },
@@ -175,60 +185,62 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Add Expense'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              value: selectedPerson,
-              items: people
-                  .map((person) => DropdownMenuItem(
-                        value: person.name,
-                        child: Text(person.name),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    selectedPerson = value;
-                  });
-                }
-              },
-              decoration: const InputDecoration(labelText: 'Person'),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<Category>(
-              value: selectedCategory,
-              items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: category.color,
-                        child: Icon(category.icon, color: Colors.white),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(category.name),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    selectedCategory = value;
-                  });
-                }
-              },
-              decoration: const InputDecoration(labelText: 'Category'),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Amount'),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: selectedPerson,
+                items: people
+                    .map((person) => DropdownMenuItem(
+                          value: person.name,
+                          child: Text(person.name),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedPerson = value;
+                    });
+                  }
+                },
+                decoration: const InputDecoration(labelText: 'Person'),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<Category>(
+                value: selectedCategory,
+                items: categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: category.color,
+                          child: Icon(category.icon, color: Colors.white),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(category.name),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      selectedCategory = value;
+                    });
+                  }
+                },
+                decoration: const InputDecoration(labelText: 'Category'),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Amount'),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -241,8 +253,15 @@ class _MainScreenState extends State<MainScreen> {
                 double amount = double.tryParse(amountController.text) ?? 0.0;
                 if (amount > 0) {
                   _addExpense(selectedPerson, selectedCategory!.name, amount);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Successfully added expense.')),
+                  );
                   Navigator.of(context).pop();
                 }
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   const SnackBar(content: Text('Please enter a valid amount.')),
+                // );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Please select a category.')),
@@ -438,6 +457,25 @@ class _MainScreenState extends State<MainScreen> {
         'balance': totalSpent - perPersonShare,
       };
     }).toList();
+  }
+
+  //get random color
+  Color _getRandomColor() {
+    final random = Random();
+    return Color.fromARGB(
+      255,
+      random.nextInt(256),
+      random.nextInt(256),
+      random.nextInt(256),
+    );
+  }
+
+  // Get a unique color for a person
+  Color _getColorForPerson(String name) {
+    if (!_colorMap.containsKey(name)) {
+      _colorMap[name] = _getRandomColor();
+    }
+    return _colorMap[name]!;
   }
 
   @override
@@ -844,114 +882,175 @@ class _MainScreenState extends State<MainScreen> {
                         padding: const EdgeInsets.only(
                           bottom: 40,
                         ),
-                        child: Scrollbar(
-                          controller: _scrollControllerSecondary,
-                          interactive: true,
-                          radius: const Radius.circular(50),
-                          thickness: 5,
-                          thumbVisibility: true,
-                          trackVisibility: false,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: ListView.builder(
+                        child: balances.isEmpty
+                            ? const Center(
+                                child: Text(
+                                "No one to show",
+                                style: TextStyle(
+                                    color: Color.fromARGB(255, 129, 135, 138),
+                                    fontWeight: FontWeight.bold),
+                              ))
+                            : Scrollbar(
                                 controller: _scrollControllerSecondary,
-                                keyboardDismissBehavior:
-                                    ScrollViewKeyboardDismissBehavior.onDrag,
-                                itemCount: balances.length,
-                                itemBuilder: (context, int i) {
-                                  final balance =
-                                      balances.elementAt(i);
-                                  // final totalExpense =
-                                  //     categoryTotals[balance]!;
-                                  return Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          color: Colors.white),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Stack(
-                                                  alignment: Alignment.center,
-                                                  children: [
-                                                    Container(
-                                                      //Yellow colour Circle
-                                                      width: 50,
-                                                      height: 50,
-                                                      decoration:const BoxDecoration(
-                                                          color: Colors.red, //Colors.yellow[700],
-                                                          shape:
-                                                              BoxShape.circle),
-                                                    ),
-                                                    const Icon(Icons.person,
-                                                        color: Colors.white),
-                                                    // myTransactionData[i]['icon'],
-                                                    // const Icon(
-                                                    //   Icons.myTransactionData[i]['icon'],
-                                                    //   color: Colors.white,
-                                                    // )
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  width: 12,
-                                                ),
-                                                Text(
-                                                  balance['name'],
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                      fontWeight:
-                                                          FontWeight.w500),
-                                                ),
-                                                const SizedBox(
-                                                  width: 20,
-                                                ),
-                                              ],
+                                interactive: true,
+                                radius: const Radius.circular(50),
+                                thickness: 5,
+                                thumbVisibility: true,
+                                trackVisibility: false,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: ListView.builder(
+                                      controller: _scrollControllerSecondary,
+                                      keyboardDismissBehavior:
+                                          ScrollViewKeyboardDismissBehavior
+                                              .onDrag,
+                                      itemCount: balances.length,
+                                      itemBuilder: (context, int i) {
+                                        //final peopleCount = balances.length;
+                                        final balance = balances.elementAt(i);
+                                        final color =
+                                            _getColorForPerson(balance['name']);
+                                        // final totalExpense =
+                                        //     categoryTotals[balance]!;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 16.0),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                color: Colors.white),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            //Yellow colour Circle
+                                                            width: 50,
+                                                            height: 50,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                                    color:
+                                                                        color, //Colors.yellow[700],
+                                                                    shape: BoxShape
+                                                                        .circle),
+                                                          ),
+                                                          const Icon(
+                                                              Icons.person,
+                                                              color:
+                                                                  Colors.white),
+                                                          // myTransactionData[i]['icon'],
+                                                          // const Icon(
+                                                          //   Icons.myTransactionData[i]['icon'],
+                                                          //   color: Colors.white,
+                                                          // )
+                                                        ],
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 12,
+                                                      ),
+                                                      balance['balance'] != 0
+                                                          ? Column(
+                                                              children: [
+                                                                Text(
+                                                                  balance[
+                                                                      'name'],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Theme.of(
+                                                                              context)
+                                                                          .colorScheme
+                                                                          .onSurface,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500),
+                                                                ),
+                                                                Text(
+                                                                  balance['balance'] >
+                                                                          0
+                                                                      ? '(Owe)'
+                                                                      : '(Pay)',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: balance['balance'] > 0
+                                                                          ? Colors
+                                                                              .green
+                                                                          : Colors
+                                                                              .red,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500),
+                                                                ),
+                                                              ],
+                                                            )
+                                                          : Text(
+                                                              balance['name'],
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .onSurface,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500),
+                                                            ),
+                                                      const SizedBox(
+                                                        width: 20,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Text(
+                                                        'Rs. ${num.parse(balance['balance'].toStringAsFixed(2)).abs()}',
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: balance[
+                                                                        'balance'] >
+                                                                    0
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Text(
+                                                        "${balance['totalSpent'].toStringAsFixed(2)}",
+                                                        style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .onSurface,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  'Rs. ${balance['balance'].toStringAsFixed(2)}',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  "${balance['totalSpent'].toStringAsFixed(2)}",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurface,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ),
+                                          ),
+                                        );
+                                      }),
+                                ),
+                              ),
                       ),
                     ],
                   ),
