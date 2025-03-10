@@ -33,6 +33,7 @@ dependencies:
   auto_size_text: ^3.0.0
   firebase_core: ^3.6.0
   cloud_firestore: ^5.4.4
+  flutter_colorpicker: ^1.0.3
 
 
 
@@ -51,8 +52,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/
   #   - images/a_dot_ham.jpeg
 
   
