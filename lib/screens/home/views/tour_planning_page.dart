@@ -1,7 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:data_management_project/data/city_data.dart';
+import 'package:data_management_project/data/city_model.dart';
 import 'package:data_management_project/screens/home/views/display_tour_planning_data.dart';
 import 'package:data_management_project/screens/home/views/main_screen.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -12,6 +15,7 @@ class TourPlanningPage extends StatefulWidget {
   State<TourPlanningPage> createState() => _TourPlanningPageState();
 }
 
+final dropDownKey = GlobalKey<DropdownSearchState<String>>();
 final _formKey = GlobalKey<FormState>();
 TextEditingController _destinationController = TextEditingController();
 TextEditingController _groupNameController = TextEditingController();
@@ -98,6 +102,14 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
     }
   }
 
+  Future<List<String>> getCityList(
+      String filter, dynamic infiniteScrollProps) async {
+    return cities
+        .map((city) => city.name)
+        .where((name) => name.toLowerCase().contains(filter.toLowerCase()))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,14 +188,13 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                 elevation: 20,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.35,
+                                                1,
                                         child: const AutoSizeText(
                                           "Arrival Destination: ",
                                           style: TextStyle(
@@ -191,33 +202,86 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                               fontWeight: FontWeight.w600),
                                         ),
                                       ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.4,
-                                        child: TextFormField(
-                                          controller: _destinationController,
-                                          keyboardType: TextInputType.name,
-                                          decoration: InputDecoration(
-                                            hintText: "Enter Destination",
-                                            hintStyle: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400),
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
-                                                borderSide: const BorderSide(
-                                                  color: Colors.blue,
-                                                )),
-                                          ),
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Please enter destination';
-                                            }
-                                            return null;
-                                          },
+                                                1,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            DropdownSearch<String>(
+                                              key: dropDownKey,
+                                              selectedItem: null,
+                                              items:
+                                                  getCityList, 
+                                              onChanged: (selectedCity) {
+                                                print(
+                                                    "Selected City: $selectedCity");
+                                                    setState(() {
+                                                  _destinationController.text =
+                                                      selectedCity!;
+                                                    });
+                                              },
+                                              dropdownBuilder:
+                                                  (context, selectedItem) {
+                                                return Text(
+                                                  selectedItem ??
+                                                      "Select a City",
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black),
+                                                );
+                                              },
+                                              popupProps: const PopupProps.menu(
+                                                fit: FlexFit.loose,
+                                                constraints: BoxConstraints(),
+                                                showSearchBox: true,
+                                                searchFieldProps:
+                                                    TextFieldProps(
+                                                  decoration: InputDecoration(
+                                                    labelText: "Search city",
+                                                    border:
+                                                        OutlineInputBorder(),
+                                                  ),
+                                                ),
+                                              ),
+                                              decoratorProps:
+                                                  const DropDownDecoratorProps(
+                                                decoration: InputDecoration(
+                                                  //labelText: "Select a City",
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                        // TextFormField(
+                                        //   controller: _destinationController,
+                                        //   keyboardType: TextInputType.name,
+                                        //   decoration: InputDecoration(
+                                        //     hintText: "Enter Destination",
+                                        //     hintStyle: const TextStyle(
+                                        //         fontSize: 15,
+                                        //         fontWeight: FontWeight.w400),
+                                        //     border: OutlineInputBorder(
+                                        //         borderRadius:
+                                        //             BorderRadius.circular(10.0),
+                                        //         borderSide: const BorderSide(
+                                        //           color: Colors.blue,
+                                        //         )),
+                                        //   ),
+                                        //   validator: (value) {
+                                        //     if (value == null ||
+                                        //         value.isEmpty) {
+                                        //       return 'Please enter destination';
+                                        //     }
+                                        //     return null;
+                                        //   },
+                                        // ),
                                       ),
                                     ],
                                   ),
