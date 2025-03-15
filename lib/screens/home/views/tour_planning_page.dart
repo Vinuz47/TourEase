@@ -23,6 +23,9 @@ TextEditingController _groupCounterController = TextEditingController();
 
 DateTime? _selectedDate;
 String? _selectedTransportMethod;
+City? selectedCity;
+double? selectedLatitude;
+double? selectedLongitude;
 final List<String> transportMethodList = [
   'Train',
   'Bus',
@@ -49,8 +52,26 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
     }
   }
 
+  /// This function returns the latitude & longitude in double format.
+  void onCitySelected(String? cityName) {
+    if (cityName != null) {
+      City city = cities.firstWhere((city) => city.name == cityName);
+      setState(() {
+        selectedCity = city;
+        selectedLatitude = city.latitude;
+        selectedLongitude = city.longitude;
+      });
+
+      // Print the values in console
+      print("Selected City: ${selectedCity!.name}");
+      print("Latitude: ${selectedLatitude}");
+      print("Longitude: ${selectedLongitude}");
+    }
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      onCitySelected(_destinationController.text);
       try {
         // Store data in Firestore
         DocumentReference docRef =
@@ -61,6 +82,8 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
           'transport-method': _selectedTransportMethod,
           'group-name': _groupNameController.text,
           'number-of-people': _groupCounterController.text,
+          "latitude": selectedLatitude,
+          "longitude": selectedLongitude,
           'createdAt': Timestamp.now(),
         });
 
@@ -71,14 +94,6 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Form submitted successfully!'),
         ));
-
-        setState(() {
-          _selectedTransportMethod = null;
-          _selectedDate = null;
-          _groupNameController.clear();
-          _destinationController.clear();
-          _groupCounterController.clear();
-        });
 
         // Clear the form
         _formKey.currentState!.reset();
@@ -93,6 +108,14 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
               ),
             ),
           );
+        });
+
+        setState(() {
+          _selectedTransportMethod = null;
+          _selectedDate = null;
+          _groupNameController.clear();
+          _destinationController.clear();
+          _groupCounterController.clear();
         });
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -216,15 +239,14 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                             DropdownSearch<String>(
                                               key: dropDownKey,
                                               selectedItem: null,
-                                              items:
-                                                  getCityList, 
+                                              items: getCityList,
                                               onChanged: (selectedCity) {
                                                 print(
                                                     "Selected City: $selectedCity");
-                                                    setState(() {
+                                                setState(() {
                                                   _destinationController.text =
                                                       selectedCity!;
-                                                    });
+                                                });
                                               },
                                               dropdownBuilder:
                                                   (context, selectedItem) {
