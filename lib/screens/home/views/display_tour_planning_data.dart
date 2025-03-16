@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:data_management_project/data/city_data.dart';
 import 'package:data_management_project/data/city_model.dart';
 import 'package:data_management_project/screens/home/views/main_screen.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -275,7 +276,7 @@ class _SummeryOfTheTourPlanningState extends State<SummeryOfTheTourPlanning> {
                     //destination
                     listTile_of_tour_summery(
                         "Destination",
-                        //"(Lat: ${data['latitude']} , Long: ${data['longitude']} 
+                        //"(Lat: ${data['latitude']} , Long: ${data['longitude']}
                         "${data['destination']}",
                         Icons.location_on),
 
@@ -300,7 +301,22 @@ class _SummeryOfTheTourPlanningState extends State<SummeryOfTheTourPlanning> {
                         children: [
                           //weather predictio button
                           bottomButtons(
-                              text: "Weather Prediction", onPressed: () {}),
+                              text: "Weather Prediction",
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          WeatherPredictionScreen(
+                                            date: data['date'],
+                                            longitude:
+                                                (data['longitude']).toString(),
+                                            latitude:
+                                                (data['latitude']).toString(),
+                                            city: data['destination'],
+                                          )),
+                                );
+                              }),
 
                           //continue button
                           bottomButtons(
