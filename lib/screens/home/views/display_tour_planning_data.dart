@@ -1,12 +1,15 @@
 import 'dart:ui';
 
+import 'package:data_management_project/data/city_data.dart';
+import 'package:data_management_project/data/city_model.dart';
 import 'package:data_management_project/screens/home/views/main_screen.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 
-class SummeryOfTheTourPlanning extends StatelessWidget {
+class SummeryOfTheTourPlanning extends StatefulWidget {
   final String collectionName;
   final String documentId;
 
@@ -15,7 +18,23 @@ class SummeryOfTheTourPlanning extends StatelessWidget {
     required this.collectionName,
     required this.documentId,
   });
+
+  @override
+  State<SummeryOfTheTourPlanning> createState() =>
+      _SummeryOfTheTourPlanningState();
+}
+
+class _SummeryOfTheTourPlanningState extends State<SummeryOfTheTourPlanning> {
   String groupName = '';
+
+  double? selectedLatitude;
+
+  double? selectedLongitude;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
 // ignore: non_constant_identifier_names
   Widget listTile_of_tour_summery(
@@ -100,6 +119,21 @@ class SummeryOfTheTourPlanning extends StatelessWidget {
     );
   }
 
+  //   /// Fetch city details based on selected city name
+  // void _fetchCityDetails(String selectedCityName) {
+  //   City? selectedCity =
+  //       cities.firstWhere((city) => city.name == selectedCityName);
+
+  //   setState(() {
+  //     selectedLatitude = selectedCity.latitude;
+  //     selectedLongitude = selectedCity.longitude;
+  //   });
+
+  //   //print("Selected City: ${selectedCity.name}");
+  //   print("Latitude: $selectedLatitude");
+  //   print("Longitude: $selectedLongitude");
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,8 +173,8 @@ class SummeryOfTheTourPlanning extends StatelessWidget {
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
-            .collection(collectionName)
-            .doc(documentId)
+            .collection(widget.collectionName)
+            .doc(widget.documentId)
             .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -238,9 +272,14 @@ class SummeryOfTheTourPlanning extends StatelessWidget {
                     //group name
                     listTile_of_tour_summery(
                         'Group Name', data['group-name'], Icons.groups_2),
+
                     //destination
                     listTile_of_tour_summery(
-                        "Destination", data['destination'], Icons.location_on),
+                        "Destination",
+                        //"(Lat: ${data['latitude']} , Long: ${data['longitude']}
+                        "${data['destination']}",
+                        Icons.location_on),
+
                     //date
                     listTile_of_tour_summery(
                         "Trip on", data['date'], Icons.date_range),
@@ -262,7 +301,22 @@ class SummeryOfTheTourPlanning extends StatelessWidget {
                         children: [
                           //weather predictio button
                           bottomButtons(
-                              text: "Weather Prediction", onPressed: () {}),
+                              text: "Weather Prediction",
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          WeatherPredictionScreen(
+                                            date: data['date'],
+                                            longitude:
+                                                (data['longitude']).toString(),
+                                            latitude:
+                                                (data['latitude']).toString(),
+                                            city: data['destination'],
+                                          )),
+                                );
+                              }),
 
                           //continue button
                           bottomButtons(
