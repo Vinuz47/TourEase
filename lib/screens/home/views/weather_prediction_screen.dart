@@ -28,6 +28,8 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
   String tempMean = '';
   String tempMax = '';
   String tempMin = '';
+  String selectSunrise = '';
+  String selectSunset = '';
   bool isLoading = true;
 
   @override
@@ -42,10 +44,10 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
   }
 
 //get future temperature and precipitation.
-  Future<Map<String, double>> fetchTemperature(
+  Future<Map<String, dynamic>> fetchTemperature(
       String date, String longitude, String latitude) async {
     String url =
-        'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$longitude,$latitude/$date?key=$apiKey&include=days&elements=datetime,tempmax,tempmin,temp,feelslikemax,feelslikemin,feelslike,precip';
+        'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$longitude,$latitude/$date?key=$apiKey&include=days&elements=datetime,tempmax,tempmin,temp,feelslikemax,feelslikemin,feelslike,precip,sunrise,sunset';
     final Uri uri = Uri.parse(url);
 
     try {
@@ -56,13 +58,20 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
         final data = json.decode(response.body);
 
         // Extract temperature details from the response
-        final tempMax = data['days'][0]['tempmax'];
-        final tempMin = data['days'][0]['tempmin'];
-        final tempMean = data['days'][0]['temp'];
-        final apparentTempMax = data['days'][0]['feelslikemax'];
-        final apparentTempMin = data['days'][0]['feelslikemin'];
-        final apparentTempMean = data['days'][0]['feelslike'];
-        final precip = data['days'][0]['precip'];
+        final tempMax = (data['days'][0]['tempmax'] as num).toDouble();
+        final tempMin = (data['days'][0]['tempmin'] as num).toDouble();
+        final tempMean = (data['days'][0]['temp'] as num).toDouble();
+        final apparentTempMax =
+            (data['days'][0]['feelslikemax'] as num).toDouble();
+        final apparentTempMin =
+            (data['days'][0]['feelslikemin'] as num).toDouble();
+        final apparentTempMean =
+            (data['days'][0]['feelslike'] as num).toDouble();
+        final precip = (data['days'][0]['precip'] as num).toDouble();
+
+        // Parse sunrise and sunset to DateTime
+        final sunrise = data['days'][0]['sunrise'];
+        final sunset = data['days'][0]['sunset'];
 
         return {
           'tempMax': tempMax,
@@ -72,6 +81,8 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
           'apparentTempMin': apparentTempMin,
           'apparentTempMean': apparentTempMean,
           'precip': precip,
+          'sunrise': sunrise,
+          'sunset': sunset
         };
       } else {
         throw Exception(
@@ -95,11 +106,13 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
         tempMax = fahrenheitToCelsius(temperatureData['tempMax']!).toString();
         tempMin = fahrenheitToCelsius(temperatureData['tempMin']!).toString();
         tempMean = fahrenheitToCelsius(temperatureData['tempMean']!).toString();
+        selectSunrise = temperatureData['sunrise'];
+        selectSunset = temperatureData['sunset'];
       });
 
       final response = await http.post(
         Uri.parse(
-            'http://192.168.1.2:5000/predict'), // Replace with your Flask server IP
+            'http://10.33.2.170:5000/predict'), // Replace with your Flask server IP
         headers: {'Content-Type': 'application/json'},
 
         body: jsonEncode({
@@ -118,7 +131,7 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
               fahrenheitToCelsius(temperatureData['apparentTempMin']!),
           'apparent_temperature_mean':
               fahrenheitToCelsius(temperatureData['apparentTempMean']!),
-          'precipitation_sum': temperatureData['precip']!*25.4,
+          'precipitation_sum': temperatureData['precip']! * 25.4,
         }),
       );
       print(double.parse(tempMax));
@@ -128,7 +141,9 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
       print(fahrenheitToCelsius(temperatureData['apparentTempMax']!));
       print(fahrenheitToCelsius(temperatureData['apparentTempMin']!));
       print(fahrenheitToCelsius(temperatureData['apparentTempMean']!));
-      print(temperatureData['precip']!*25.4);
+      print(temperatureData['precip']! * 25.4);
+      print(temperatureData['sunrise']);
+      print(temperatureData['sunset']);
 
       //  print("Status code: ${response.statusCode}");
 
@@ -227,6 +242,20 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
     }
   }
 
+  //greeting widget
+  String getGreeting() {
+    int hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 16) {
+      return 'Good Afternoon';
+    } else if (hour >= 16 && hour < 20) {
+      return 'Good Evening';
+    } else {
+      return 'Good Night';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -317,10 +346,10 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                             //       color: Colors.white, fontWeight: FontWeight.w300),
                             // ),
                             const SizedBox(height: 18),
-                            const Center(
+                            Center(
                               child: Text(
-                                'Good Morning',
-                                style: TextStyle(
+                                getGreeting(),
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 25,
                                     fontWeight: FontWeight.bold),
@@ -374,20 +403,20 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                                       scale: 8,
                                     ),
                                     const SizedBox(width: 5),
-                                    const Column(
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Sunrise',
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w300),
                                         ),
-                                        SizedBox(height: 3),
+                                        const SizedBox(height: 3),
                                         Text(
-                                          "06.00 AM",
-                                          style: TextStyle(
+                                          selectSunrise,
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w700),
                                         ),
@@ -402,20 +431,20 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                                       scale: 8,
                                     ),
                                     const SizedBox(width: 5),
-                                    const Column(
+                                    Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Sunset',
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w300),
                                         ),
-                                        SizedBox(height: 3),
+                                        const SizedBox(height: 3),
                                         Text(
-                                          "7.00 PM",
-                                          style: TextStyle(
+                                          selectSunset,
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.w700),
                                         ),

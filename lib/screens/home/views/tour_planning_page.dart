@@ -43,7 +43,7 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
       context: context,
       initialDate: DateTime.now(), // Current date as default
       firstDate: DateTime(2000), // Earliest date selectable
-      lastDate: DateTime(2100), // Latest date selectable
+      lastDate: DateTime.now().add(const Duration(days: 14)) // Latest date selectable
     );
     if (pickedDate != null && pickedDate != _selectedDate) {
       setState(() {
@@ -281,29 +281,7 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                             ),
                                           ],
                                         ),
-                                        // TextFormField(
-                                        //   controller: _destinationController,
-                                        //   keyboardType: TextInputType.name,
-                                        //   decoration: InputDecoration(
-                                        //     hintText: "Enter Destination",
-                                        //     hintStyle: const TextStyle(
-                                        //         fontSize: 15,
-                                        //         fontWeight: FontWeight.w400),
-                                        //     border: OutlineInputBorder(
-                                        //         borderRadius:
-                                        //             BorderRadius.circular(10.0),
-                                        //         borderSide: const BorderSide(
-                                        //           color: Colors.blue,
-                                        //         )),
-                                        //   ),
-                                        //   validator: (value) {
-                                        //     if (value == null ||
-                                        //         value.isEmpty) {
-                                        //       return 'Please enter destination';
-                                        //     }
-                                        //     return null;
-                                        //   },
-                                        // ),
+                                        
                                       ),
                                     ],
                                   ),
