@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'package:data_management_project/constant.dart';
 import 'package:data_management_project/screens/home/views/same_location_other_dates_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
 
       final response = await http.post(
         Uri.parse(
-            'http://10.33.2.176:5000/predict'), // Replace with your Flask server IP
+            PREDICT_ENDPOINT), // Replace with your Flask server IP
         headers: {'Content-Type': 'application/json'},
 
         body: jsonEncode({

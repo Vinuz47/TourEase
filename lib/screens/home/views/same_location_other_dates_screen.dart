@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:data_management_project/constant.dart';
 import 'package:data_management_project/screens/home/views/weather_prediction_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -86,7 +87,7 @@ class _SameLocationOtherDatesScreenState
         final tempData = await fetchTemperature(date);
 
         final response = await http.post(
-          Uri.parse('http://10.33.2.176:5000/predict'),
+          Uri.parse(PREDICT_ENDPOINT),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'latitude': double.parse(widget.latitude),

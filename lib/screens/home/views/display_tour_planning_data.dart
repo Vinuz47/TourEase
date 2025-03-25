@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_management_project/data/city_data.dart';
 import 'package:data_management_project/data/city_model.dart';
 import 'package:data_management_project/screens/home/views/main_screen.dart';
@@ -96,26 +97,25 @@ class _SummeryOfTheTourPlanningState extends State<SummeryOfTheTourPlanning> {
               onPressed: () async {
                 String updatedValue = controller.text.trim();
                 if (updatedValue.isNotEmpty) {
-                  
-                   await FirebaseFirestore.instance
+                  await FirebaseFirestore.instance
                       .collection(widget.collectionName)
                       .doc(widget.documentId)
-                      .update({fieldName: updatedValue})
-                      ;
+                      .update({fieldName: updatedValue});
 
-                      if(fieldName == 'destination'){
-                        City city = cities.firstWhere((city) => city.name == updatedValue);
+                  if (fieldName == 'destination') {
+                    City city =
+                        cities.firstWhere((city) => city.name == updatedValue);
 
-                        await FirebaseFirestore.instance
-                      .collection(widget.collectionName)
-                      .doc(widget.documentId)
-                      .update({"latitude": city.latitude});
+                    await FirebaseFirestore.instance
+                        .collection(widget.collectionName)
+                        .doc(widget.documentId)
+                        .update({"latitude": city.latitude});
 
-                      await FirebaseFirestore.instance
-                      .collection(widget.collectionName)
-                      .doc(widget.documentId)
-                      .update({"longitude": city.longitude});
-                      }
+                    await FirebaseFirestore.instance
+                        .collection(widget.collectionName)
+                        .doc(widget.documentId)
+                        .update({"longitude": city.longitude});
+                  }
 
                   setState(() {}); // Refresh UI
                   Navigator.pop(context);
@@ -171,12 +171,15 @@ class _SummeryOfTheTourPlanningState extends State<SummeryOfTheTourPlanning> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(subtitle,
+                    AutoSizeText(subtitle,
+                        maxLines: 2,
+                        minFontSize: 5,
+                        overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.right,
                         style: const TextStyle(
                           color: Color.fromARGB(255, 15, 49, 77),
                           fontWeight: FontWeight.w500,
-                          fontSize: 15,
+                          //fontSize: 15,
                         )),
                     InkWell(
                       onTap: () {
