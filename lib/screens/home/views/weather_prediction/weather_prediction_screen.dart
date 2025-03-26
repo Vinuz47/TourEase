@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:data_management_project/constant.dart';
-import 'package:data_management_project/screens/home/views/same_location_other_dates_screen.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/different_location_same_date.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/same_location_other_dates_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -113,8 +114,7 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
       });
 
       final response = await http.post(
-        Uri.parse(
-            PREDICT_ENDPOINT), // Replace with your Flask server IP
+        Uri.parse(PREDICT_ENDPOINT), // Replace with your Flask server IP
         headers: {'Content-Type': 'application/json'},
 
         body: jsonEncode({
@@ -136,7 +136,6 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
           'precipitation_sum': temperatureData['precip']! * 25.4,
         }),
       );
-      
 
       //  print("Status code: ${response.statusCode}");
 
@@ -332,7 +331,8 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                         height: MediaQuery.of(context).size.height,
                         child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            //mainAxisAlignment: MainAxisAlignment.start,
+                            //crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // const Text(
                               //   '📍 Weather name',
@@ -514,30 +514,74 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                                 ],
                               ),
 
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Center(
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                SameLocationOtherDatesScreen(
-                                                  city: widget.city,
-                                                  longitude: widget.longitude,
-                                                  latitude: widget.latitude,
-                                                )),
-                                      );
-                                    },
-                                    child: const Text("Check other dates",
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                //mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    SameLocationOtherDatesScreen(
+                                                      city: widget.city,
+                                                      longitude:
+                                                          widget.longitude,
+                                                      latitude: widget.latitude,
+                                                    )),
+                                          );
+                                        },
+                                        child: const Text("Check other dates",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              )
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DifferentLocationSameDate(
+                                                      date: widget.date,
+                                                    )),
+                                          );
+                                        },
+                                        child: const Text(
+                                            "Check other Locations",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ],
                           ),
                         ),

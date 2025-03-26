@@ -4,7 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_management_project/data/city_data.dart';
 import 'package:data_management_project/data/city_model.dart';
 import 'package:data_management_project/screens/home/views/main_screen.dart';
-import 'package:data_management_project/screens/home/views/weather_prediction_screen.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/weather_prediction_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

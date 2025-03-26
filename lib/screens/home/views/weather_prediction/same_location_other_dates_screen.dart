@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_management_project/constant.dart';
-import 'package:data_management_project/screens/home/views/weather_prediction_screen.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/weather_prediction_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
