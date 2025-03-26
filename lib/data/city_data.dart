@@ -76,5 +76,3 @@ List<City> westernAreaList = [
   City(name: "Maharagama", longitude: 79.899994, latitude: 6.800003),
   City(name: "Moratuwa", longitude: 79.899994, latitude: 6.800003),
 ];
-
-

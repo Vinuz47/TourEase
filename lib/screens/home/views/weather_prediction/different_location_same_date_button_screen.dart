@@ -1,19 +1,27 @@
 import 'dart:ui';
 
+import 'package:data_management_project/data/city_data.dart';
+import 'package:data_management_project/data/city_model.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/different_location_same_date_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class DifferentLocationSameDate extends StatefulWidget {
+class DifferentLocationSameDateButtonScreen extends StatefulWidget {
   final String date;
-  const DifferentLocationSameDate({super.key, required this.date});
+  const DifferentLocationSameDateButtonScreen({super.key, required this.date});
 
   @override
-  State<DifferentLocationSameDate> createState() =>
-      _DifferentLocationSameDateState();
+  State<DifferentLocationSameDateButtonScreen> createState() =>
+      _DifferentLocationSameDateButtonScreenState();
 }
 
-Widget _categoriesButton(BuildContext context, String title, String subtitle,
-    {Function()? onPressed}) {
+Widget _categoriesButton(
+  BuildContext context,
+  String title,
+  String subtitle,
+  String date,
+  List<City> locations,
+) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
     child: ElevatedButton(
@@ -25,7 +33,17 @@ Widget _categoriesButton(BuildContext context, String title, String subtitle,
                     borderRadius: BorderRadius.circular(10))),
             backgroundColor:
                 WidgetStateProperty.all<Color>(Colors.transparent)),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DifferentLocationSameDateScreen(
+                      date: date,
+                      appBarTitle: title,
+                      locations: locations,
+                    )),
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.only(top: 10, bottom: 5),
           child: Column(
@@ -68,7 +86,8 @@ Widget _categoriesButton(BuildContext context, String title, String subtitle,
   );
 }
 
-class _DifferentLocationSameDateState extends State<DifferentLocationSameDate> {
+class _DifferentLocationSameDateButtonScreenState
+    extends State<DifferentLocationSameDateButtonScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,20 +157,43 @@ class _DifferentLocationSameDateState extends State<DifferentLocationSameDate> {
                           //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            
-                            _categoriesButton(context, "Southern Costal Tour",
-                                "Galle, Weligama, Matara, Hambantota"),
-                            _categoriesButton(context, "Eastern Costal Tour",
-                                "Trincomalee, Kalmunei"),
-                            _categoriesButton(context, "Western Costal Tour",
-                                "Mount Lavinia, Negambo, Kaluthara, Benthota"),
-                            _categoriesButton(context, "Northern Costal Tour",
-                                "Jaffna, Mannar, Puthalam"),
-                            _categoriesButton(context, "Country Side Tour",
-                                "Rathnapura, Badulla, Kurunagala, Kandy, Mathle, Hatton"),
-                            _categoriesButton(context, "Western Area Tour",
-                                "Colombo, Gampaha, Maharagama, Moratuwa,"),
-                            
+                            _categoriesButton(
+                                context,
+                                "Southern Costal Tour",
+                                "Galle, Weligama, Matara, Hambantota",
+                                widget.date,
+                                southerCoastalList),
+                            _categoriesButton(
+                                context,
+                                "Eastern Costal Tour",
+                                "Trincomalee, Kalmunei",
+                                widget.date,
+                                easternCoastalList),
+                            _categoriesButton(
+                                context,
+                                "Western Costal Tour",
+                                "Mount Lavinia, Negambo, Kaluthara, Benthota",
+                                widget.date,
+                                westernCoastalList),
+                            _categoriesButton(
+                                context,
+                                "Northern Costal Tour",
+                                "Jaffna, Mannar, Puthalam",
+                                widget.date,
+                                northernCoastalList),
+                            _categoriesButton(
+                                context,
+                                "Country Side Tour",
+                                "Rathnapura, Badulla, Kurunagala, Kandy, Mathle, Hatton",
+                                widget.date,
+                                countrySideList),
+                            _categoriesButton(
+                                context,
+                                "Western Area Tour",
+                                "Colombo, Gampaha, Maharagama, Moratuwa,",
+                                widget.date,
+                                westernAreaList),
+
                             // ElevatedButton(
                             //     onPressed: () {},
                             //     child: const Text("Eastern Costal Tour")),

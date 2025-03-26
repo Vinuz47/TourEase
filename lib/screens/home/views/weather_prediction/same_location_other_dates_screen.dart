@@ -26,7 +26,7 @@ class SameLocationOtherDatesScreen extends StatefulWidget {
 
 class _SameLocationOtherDatesScreenState
     extends State<SameLocationOtherDatesScreen> {
-  String apiKey = '9DGX7CF4675ZQU8EP5ELGRAWN';
+  String apiKey = API_KEY;
   bool isLoading = true;
   List<Map<String, dynamic>> predictions = [];
 

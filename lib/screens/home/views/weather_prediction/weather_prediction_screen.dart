@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 import 'package:data_management_project/constant.dart';
-import 'package:data_management_project/screens/home/views/weather_prediction/different_location_same_date.dart';
+import 'package:data_management_project/screens/home/views/weather_prediction/different_location_same_date_button_screen.dart';
 import 'package:data_management_project/screens/home/views/weather_prediction/same_location_other_dates_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class WeatherPredictionScreen extends StatefulWidget {
 
 class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
   String prediction = '';
-  String apiKey = '9DGX7CF4675ZQU8EP5ELGRAWN';
+  String apiKey = API_KEY;
   String tempMean = '';
   String tempMax = '';
   String tempMin = '';
@@ -566,7 +566,7 @@ class _WeatherPredictionScreenState extends State<WeatherPredictionScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    DifferentLocationSameDate(
+                                                    DifferentLocationSameDateButtonScreen(
                                                       date: widget.date,
                                                     )),
                                           );
