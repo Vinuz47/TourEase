@@ -26,13 +26,7 @@ String? _selectedTransportMethod;
 City? selectedCity;
 double? selectedLatitude;
 double? selectedLongitude;
-final List<String> transportMethodList = [
-  'Train',
-  'Bus',
-  'Car',
-  'Van',
-  'Other'
-];
+final List<String> transportMethodList = ['Train', 'Bus', 'Car', 'Van', 'Other'];
 
 class _TourPlanningPageState extends State<TourPlanningPage> {
   // Function to show the date picker
@@ -63,9 +57,9 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
       });
 
       // Print the values in console
-      print("Selected City: ${selectedCity!.name}");
-      print("Latitude: ${selectedLatitude}");
-      print("Longitude: ${selectedLongitude}");
+      // print("Selected City: ${selectedCity!.name}");
+      // print("Latitude: ${selectedLatitude}");
+      // print("Longitude: ${selectedLongitude}");
     }
   }
 
@@ -74,11 +68,9 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
       onCitySelected(_destinationController.text);
       try {
         // Store data in Firestore
-        DocumentReference docRef =
-            await FirebaseFirestore.instance.collection('tour_plan').add({
+        DocumentReference docRef = await FirebaseFirestore.instance.collection('tour_plan').add({
           'date': DateFormat('yyyy-MM-dd').format(_selectedDate!),
-          'destination': _destinationController.text[0].toUpperCase() +
-              _destinationController.text.substring(1),
+          'destination': _destinationController.text[0].toUpperCase() + _destinationController.text.substring(1),
           'transport-method': _selectedTransportMethod,
           'group-name': _groupNameController.text,
           'number-of-people': _groupCounterController.text,
@@ -125,12 +117,8 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
     }
   }
 
-  Future<List<String>> getCityList(
-      String filter, dynamic infiniteScrollProps) async {
-    return cities
-        .map((city) => city.name)
-        .where((name) => name.toLowerCase().contains(filter.toLowerCase()))
-        .toList();
+  Future<List<String>> getCityList(String filter, dynamic infiniteScrollProps) async {
+    return cities.map((city) => city.name).where((name) => name.toLowerCase().contains(filter.toLowerCase())).toList();
   }
 
   @override
@@ -146,15 +134,12 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding:
-              const EdgeInsets.only(top: 12, left: 20, right: 20, bottom: 12),
+          padding: const EdgeInsets.only(top: 12, left: 20, right: 20, bottom: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                  decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 120, 182, 122),
-                      borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: const Color.fromARGB(255, 120, 182, 122), borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Form(
@@ -168,38 +153,25 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           const Text(
                                             "Tour Planning Date: ",
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600),
+                                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                                           ),
                                           ElevatedButton(
-                                              onPressed: () =>
-                                                  _selectDate(context),
+                                              onPressed: () => _selectDate(context),
                                               style: const ButtonStyle(
-                                                backgroundColor:
-                                                    WidgetStatePropertyAll(
-                                                        Color.fromARGB(
-                                                            255, 33, 31, 31)),
-                                                foregroundColor:
-                                                    WidgetStatePropertyAll(
-                                                        Colors.white),
+                                                backgroundColor: WidgetStatePropertyAll(Color.fromARGB(255, 33, 31, 31)),
+                                                foregroundColor: WidgetStatePropertyAll(Colors.white),
                                               ),
                                               child: const Text("Select date")),
                                         ],
                                       ),
-                                      _selectedDate != null
-                                          ? Text(
-                                              "Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}")
-                                          : const SizedBox()
+                                      _selectedDate != null ? Text("Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}") : const SizedBox()
                                     ],
                                   ),
                                 ),
@@ -215,64 +187,48 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                1,
+                                        width: MediaQuery.of(context).size.width * 1,
                                         child: const AutoSizeText(
                                           "Arrival Destination: ",
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600),
+                                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                                         ),
                                       ),
                                       const SizedBox(
                                         height: 10,
                                       ),
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                1,
+                                        width: MediaQuery.of(context).size.width * 1,
                                         child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             DropdownSearch<String>(
                                               key: dropDownKey,
                                               selectedItem: null,
                                               items: getCityList,
                                               onChanged: (selectedCity) {
-                                                print(
-                                                    "Selected City: $selectedCity");
+                                                print("Selected City: $selectedCity");
                                                 setState(() {
-                                                  _destinationController.text =
-                                                      selectedCity!;
+                                                  _destinationController.text = selectedCity!;
                                                 });
                                               },
-                                              dropdownBuilder:
-                                                  (context, selectedItem) {
+                                              dropdownBuilder: (context, selectedItem) {
                                                 return Text(
-                                                  selectedItem ??
-                                                      "Select a City",
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black),
+                                                  selectedItem ?? "Select a City",
+                                                  style: const TextStyle(fontSize: 16, color: Colors.black),
                                                 );
                                               },
                                               popupProps: const PopupProps.menu(
                                                 fit: FlexFit.loose,
                                                 constraints: BoxConstraints(),
                                                 showSearchBox: true,
-                                                searchFieldProps:
-                                                    TextFieldProps(
+                                                searchFieldProps: TextFieldProps(
                                                   decoration: InputDecoration(
                                                     labelText: "Search city",
-                                                    border:
-                                                        OutlineInputBorder(),
+                                                    border: OutlineInputBorder(),
                                                   ),
                                                 ),
                                               ),
-                                              decoratorProps:
-                                                  const DropDownDecoratorProps(
+                                              decoratorProps: const DropDownDecoratorProps(
                                                 decoration: InputDecoration(
                                                   //labelText: "Select a City",
                                                   border: OutlineInputBorder(),
@@ -318,20 +274,15 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
                                     //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
+                                        width: MediaQuery.of(context).size.width * 0.4,
                                         child: const AutoSizeText(
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           "Enter Transport Method: ",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 15),
+                                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                                         ),
                                       ),
                                       const SizedBox(
@@ -343,21 +294,16 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                           decoration: InputDecoration(
                                             labelText: 'Select method',
                                             border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              borderRadius: BorderRadius.circular(10.0),
                                             ),
                                           ),
-                                          value:
-                                              _selectedTransportMethod, // Currently selected value
+                                          value: _selectedTransportMethod, // Currently selected value
                                           onChanged: (String? newValue) {
                                             setState(() {
-                                              _selectedTransportMethod =
-                                                  newValue; // Update the selected value
+                                              _selectedTransportMethod = newValue; // Update the selected value
                                             });
                                           },
-                                          items: transportMethodList
-                                              .map<DropdownMenuItem<String>>(
-                                                  (String itemOfCategories) {
+                                          items: transportMethodList.map<DropdownMenuItem<String>>((String itemOfCategories) {
                                             return DropdownMenuItem<String>(
                                               value: itemOfCategories,
                                               child: Text(itemOfCategories),
@@ -377,44 +323,33 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
+                                        width: MediaQuery.of(context).size.width * 0.4,
                                         child: const AutoSizeText(
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           "Enter Group Name: ",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 15),
+                                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                                         ),
                                       ),
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.3,
+                                        width: MediaQuery.of(context).size.width * 0.3,
                                         child: TextFormField(
                                           controller: _groupNameController,
                                           keyboardType: TextInputType.name,
                                           decoration: InputDecoration(
                                             hintText: "Type Name",
-                                            hintStyle: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400),
+                                            hintStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                                             border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                                 borderSide: const BorderSide(
                                                   color: Colors.blue,
                                                 )),
                                           ),
                                           validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
+                                            if (value == null || value.isEmpty) {
                                               return 'Please enter name';
                                             }
                                             return null;
@@ -433,45 +368,33 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
+                                        width: MediaQuery.of(context).size.width * 0.4,
                                         child: const AutoSizeText(
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           "Number of People in group: ",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 15),
+                                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                                         ),
                                       ),
                                       SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.3,
+                                        width: MediaQuery.of(context).size.width * 0.3,
                                         child: TextFormField(
                                           controller: _groupCounterController,
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(),
+                                          keyboardType: const TextInputType.numberWithOptions(),
                                           decoration: InputDecoration(
                                             hintText: "Enter Amount",
-                                            hintStyle: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400),
+                                            hintStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                                             border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10.0),
+                                                borderRadius: BorderRadius.circular(10.0),
                                                 borderSide: const BorderSide(
                                                   color: Colors.blue,
                                                 )),
                                           ),
                                           validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
+                                            if (value == null || value.isEmpty) {
                                               return 'Please enter amount';
                                             }
                                             return null;
@@ -494,9 +417,7 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
                 height: 20,
               ),
               ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          const Color.fromARGB(255, 6, 27, 7))),
+                  style: ButtonStyle(backgroundColor: WidgetStateProperty.all(const Color.fromARGB(255, 6, 27, 7))),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -522,8 +443,7 @@ class _TourPlanningPageState extends State<TourPlanningPage> {
         },
         child: const Icon(Icons.add), // Icon for the FAB
       ),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.endFloat, // Optional location adjustment
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat, // Optional location adjustment
     );
   }
 }

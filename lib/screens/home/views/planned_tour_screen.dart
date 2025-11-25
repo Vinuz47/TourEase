@@ -7,8 +7,7 @@ class PlannedTourScreen extends StatelessWidget {
   const PlannedTourScreen({super.key});
 
   Future<List<Map<String, dynamic>>> getTrips() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('tour_plan').get();
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('tour_plan').get();
 
     return querySnapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -25,8 +24,7 @@ class PlannedTourScreen extends StatelessWidget {
         children: [
           // top adding new trips button
           Padding(
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, bottom: 30, top: 15),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 30, top: 15),
             child: SizedBox(
               width: double.infinity, // Full screen width
               height: 50, // Set a specific height
@@ -78,8 +76,7 @@ class PlannedTourScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     var trip = trips[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 15),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
@@ -100,24 +97,18 @@ class PlannedTourScreen extends StatelessWidget {
                                 color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 2,
                                 blurRadius: 7,
-                                offset: const Offset(
-                                    0, 3), // changes position of shadow
+                                offset: const Offset(0, 3), // changes position of shadow
                               ),
                             ],
-                            border: Border.all(
-                                color: Colors.grey, width: 2), // Outline border
+                            border: Border.all(color: Colors.grey, width: 2), // Outline border
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white, // Background color (optional)
                           ),
                           child: ListTile(
                             //tileColor: Colors.green[50],
                             isThreeLine: true,
-                            title: Text(trip['group-name'] ?? 'Unnamed Trip',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18)),
-                            subtitle: Text(
-                                trip['destination'] ?? 'Unknown Location',
-                                style: const TextStyle(fontSize: 16)),
+                            title: Text(trip['group-name'] ?? 'Unnamed Trip', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                            subtitle: Text(trip['destination'] ?? 'Unknown Location', style: const TextStyle(fontSize: 16)),
                             trailing: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -125,37 +116,33 @@ class PlannedTourScreen extends StatelessWidget {
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                SizedBox(
-                                  height: 35, // Set button height
-                                  width: 100,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              SummeryOfTheTourPlanning(
-                                            collectionName: 'tour_plan',
-                                            documentId: trip['id'],
+                                Expanded(
+                                  child: SizedBox(
+                                    // height: 30, // Set button height
+                                    width: 100,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SummeryOfTheTourPlanning(
+                                              collectionName: 'tour_plan',
+                                              documentId: trip['id'],
+                                            ),
                                           ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Theme.of(context).colorScheme.outline,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10), // Rounded corners
                                         ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.outline,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            10), // Rounded corners
+                                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                                        textStyle: const TextStyle(fontSize: 12), // Adjust font size if needed
                                       ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      textStyle: const TextStyle(
-                                          fontSize:
-                                              12), // Adjust font size if needed
+                                      child: const Text("Check"),
                                     ),
-                                    child: const Text("Check"),
                                   ),
                                 )
                               ],
